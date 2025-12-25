@@ -1,17 +1,15 @@
-FROM python:3.10.8-slim-buster
+# Buster ki jagah Bullseye (Debian 11) use karein jo stable hai
+FROM python:3.10-slim-bullseye
 
-# apt-get update aur git install ko ek saath karein (cache optimize karne ke liye)
+# System updates aur git installation
 RUN apt-get update && apt-get install -y git
 
-# requirements ko copy karein
-COPY requirements.txt /requirements.txt
+# Work directory set karein
+WORKDIR /app
+COPY . .
 
-# pip upgrade aur installation
+# Requirements install karein
 RUN pip3 install -U pip && pip3 install -U -r requirements.txt
 
-# work directory set karein
-WORKDIR /VJ-Forward-Bot
-COPY . /VJ-Forward-Bot
-
-# Render port fix aur dono apps ko ek saath chalane ke liye
+# Render port fix aur bot start
 CMD gunicorn app:app --bind 0.0.0.0:$PORT --daemon && python3 main.py
