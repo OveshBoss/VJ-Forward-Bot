@@ -1,12 +1,17 @@
 FROM python:3.10.8-slim-buster
 
-RUN apt update && apt upgrade -y
-RUN apt install git -y
+# apt-get update aur git install ko ek saath karein (cache optimize karne ke liye)
+RUN apt-get update && apt-get install -y git
+
+# requirements ko copy karein
 COPY requirements.txt /requirements.txt
 
-RUN cd /
+# pip upgrade aur installation
 RUN pip3 install -U pip && pip3 install -U -r requirements.txt
-RUN mkdir /VJ-Forward-Bot
+
+# work directory set karein
 WORKDIR /VJ-Forward-Bot
 COPY . /VJ-Forward-Bot
-CMD gunicorn app:app & python3 main.py
+
+# Render port fix aur dono apps ko ek saath chalane ke liye
+CMD gunicorn app:app --bind 0.0.0.0:$PORT --daemon && python3 main.py
